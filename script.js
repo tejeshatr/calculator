@@ -46,8 +46,13 @@ function stringit(e){
 
 function giveAns(){
 	reset();
-	oflag = 1;
-	expression = ''+res;
+	if(oflag == 0){
+		oflag = 1;
+		expression += ''+res;
+	}
+	else{
+		evaluate();
+	}
 	resbox.textContent = expression;
 }
 
