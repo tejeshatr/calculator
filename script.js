@@ -23,6 +23,7 @@ function stringit(e){
 		if(oflag==1){
 			if(expression.length == 0){
 				resbox.textContent = 'Not Allowed';
+				oflag = 0;
 				return;
 			}
 			else
@@ -42,7 +43,9 @@ function stringit(e){
 
 function giveAns(){
 	reset();
-	resbox.textContent = res;
+	oflag = 1;
+	expression = ''+res;
+	resbox.textContent = expression;
 }
 
 function reset(){
@@ -109,7 +112,8 @@ function evaluate(){
 
 	reset();
 	oflag = 1;
-	resbox.textContent = res;
+	expression = ''+res;
+	resbox.textContent = expression;
 		
 }
 
