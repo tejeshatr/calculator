@@ -1,115 +1,126 @@
-var v=[''];
-var op=[''];
-var flag = 1;
-var opactive = 0;
-var vindex = 0;
-var oindex = 0;
-var numbers = document.querySelectorAll('.num');
+//unicode symbols: ÷, ⥢
+
+var olist = ['+', '-', '*', '%', '÷'];
+var slist = ['AC', 'CE', '⥢']
+
+var values = document.querySelectorAll('.num');
 var operators = document.querySelectorAll('.opr');
-var eq = document.querySelector('.eq');
+var back = document.querySelector('.back');
 var clear = document.querySelector('.clear');
-var resbox = document.querySelector('.res');
+var ans = document.querySelector('.ans');
+var eq = document.querySelector('.eq');
 
-function storeVal(e){
-	if(flag == 1){
-		resbox.textContent = '';
-		flag = 0;
-	}
-	if(opactive === 1){
-		v[vindex] = e.target.textContent;
-		resbox.textContent = v[vindex];
-		vindex++;
-	}
-	else{
-		v[vindex] += e.target.textContent;
-		resbox.textContent += v[vindex];
-	}
-}
+var resbox = document.querySelector('.res')
 
-function addop(e){
-	if(flag == 1){
-		resbox.textContent = '';
-		flag = 0;
-	}
-	if(opactive === 0){
-		op[oindex] = e.target.textContent;
-		resbox.textContent += op[oindex];
-		oindex++;
-		opactive = 1;
-	}
-	else{
-		op[oindex] = e.target.textContent;
-		resbox.textContent = resbox.textContent.slice(0, -1) + op[oindex];
+var expression = '';
+var oflag = 1;
+var res = 0;
 
-	}
-}
 
-function factorial(n){
-	res = 1;
-	while(n != 1){
-		res *= n;
-		n--;
-	}
-
-	return res;
-}
-
-function evaluate(e){
-	let res = 0, f = 1;
-	for(let i = 0; i < vindex/2; i++){
-	if(f == 1)
-			break;
-	if(v2 === ''){
-		if(op === '+')
-			res = v1;
-		else if(op === '-')
-			res = '-'+v1;
-		else if(op === '!')
-			res = factorial(Number(v1));
+function stringit(e){
+	let t = e.target.textContent;
+	if(e.target.classList.contains('opr')){
+		if(oflag==1){
+			if(expression.length == 0){
+				resbox.textContent = 'Not Allowed';
+				return;
+			}
+			else
+				expression=expression.slice(0, expression.length-1)+t;
+		}
 		else{
-			res = "Error";
-			f = 1;
+			oflag = 1;
+			expression += t;
 		}
 	}
 	else{
-		switch(op){
-			case '+': res = Number(v1)+Number(v2);break;
-			case '-': res = Number(v1)-Number(v2);break;
-			case '*': res = Number(v1)*Number(v2);break;
-			case '/': 
-				if(v2 !== '0')
-					res = Number(v1)/Number(v2);
-				else{
-					res = 'Error';
-					f = 1;
+		oflag = 0;
+		expression += t;
+	}
+	resbox.textContent = expression;
+}
+
+function giveAns(){
+	reset();
+	resbox.textContent = res;
+}
+
+function reset(){
+	resbox.textContent = '';
+	expression = '';
+	oflag = 0;
+
+}
+
+function rmLast(){
+	oflag = 0;
+	expression = expression.slice(0, length-1);
+	resbox.textContent = expression;
+}
+
+function dvyd(x,y){
+	if(y !== 0)
+		return x/y;
+	return 'Error! Division by Zero'
+}
+
+function expeval(v1, op, v2){
+	let r = 0;
+	let x = Number(v1);
+	let y = Number(v2);
+	switch(op){
+		case '+': r = x+y; break;
+		case '-': r = x-y; break;
+		case '*': r = x*y; break;
+		case '÷': r = dvyd(x, y); break;
+		case '%': r = x%y; break; 
+	}
+	if(r%1 !== 1)
+		r = Number(r.toFixed(5));
+	return r;
+}
+
+function evaluate(){
+	let op = '';
+	let v1 = '';
+	let v2 = '';
+
+	if(oflag == 1)
+		res = 'Error';
+	else{
+		for(let k = 0; k < expression.length; k++){
+			if(olist.includes(expression[k])){
+				op = expression[k];
+				for(let j = k+1;; j++){
+					if(j == expression.length || olist.includes(expression[j]))
+						break;
+					v2 += expression[j];
 				}
-				break;
-			case '!':
-				res = 'Error';
-				flag = 1;
+				res = expeval(v1, op, v2);
+				if(!(Number(res) == res))
+					break;
+				console.log(v1, v2, op, res);
+				op = v1 = v2 = '';
+			}
+			else
+				v1 += expression[k];
 		}
 	}
-	}
-	res = res+'';
+
+	reset();
+	oflag = 1;
 	resbox.textContent = res;
-	flag = 1;
+		
 }
 
-function clearVals(){
-	v1 = [''];
-	op = [''];
-	vindex = 0;
-	oindex = 0;
-}
+for(let k = 0; k < values.length; k++)
+	values[k].addEventListener('click', stringit);
 
-function clearAll(e){
-	resbox.textContent = '';
-	clearVals();
-}
+for(let k = 0; k < operators.length; k++)
+	operators[k].addEventListener('click', stringit);
 
-numbers.forEach((number) => number.addEventListener(
-	'click', storeVal));
-operators.forEach((operator) => operator.addEventListener(
-	'click', addop));
+
+ans.addEventListener('click', giveAns);
+clear.addEventListener('click', reset);
+back.addEventListener('click', rmLast);
 eq.addEventListener('click', evaluate);
-clear.addEventListener('click', clearAll);
