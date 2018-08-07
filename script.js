@@ -19,7 +19,10 @@ var res = 0;
 
 function stringit(e){
 	let t = e.target.textContent;
-	if(e.target.classList.contains('opr')){
+	if(expression == ''+res)
+		if(!e.target.classList.contains('opr'))
+			expression = '';
+	else if(e.target.classList.contains('opr')){
 		if(oflag==1){
 			if(expression.length == 0){
 				resbox.textContent = 'Not Allowed';
